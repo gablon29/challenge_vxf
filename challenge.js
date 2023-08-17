@@ -58,32 +58,56 @@ promotions:
       min_amount: 100 # sólo aplica si el total es mayor a 100
  */
 
+const PRICE_ORANGE = 12
+const PROMOTION_ONE = 'one';
+const PROMOTION_TWO = 'two';
 
-function totalValue(totalOrange, totalApp, bag, tip, promotions) {
-    const precioTotalApp = totalPrecioApp(totalApp)
-    const parcialValue = totalOrange + precioTotalApp
-    const parametroPropina = 10 * parcialValue / 100
-    if (bag) {
-        parcialValue += bag
-    }
-    if (tip) {
-        if (tip > parametroPropina) {
-            parcialValue += tip
-        }
-    }
-}
-
-
-
-const totalPrecioApp = (totalApp) => {
-    if (totalApp >= 1 && totalApp <= 10) {
-        return 10
-    }
-    else if (totalApp >= 11 && totalApp <= 20) {
-        return 9
-    } else if (totalApp >= 21 && totalApp <= 30) {
-        return 8
-    } else {
-        return 0
-    }
+// funcion para sacar el precio por cantidad de manzanas
+const calculateAppePrice = (totalApp) => {
+  if (totalApp >= 1 && totalApp <= 10) {
+    return 10
+  }
+  else if (totalApp >= 11 && totalApp <= 20) {
+    return 9
+  } else if (totalApp >= 21 && totalApp <= 30) {
+    return 8
+  } else {
+    return 0
+  }
 };
+
+
+// Sacamos el valor correspondiente a los descuentos
+const applyPromotion = (total, promotion) => {
+  if (promotion === PROMOTION_ONE) {
+    return total * 0.8; // 20% discount 0.2 (100% - 20% = 80%, o 0.8 en formato decimal)
+  } else if (promotion === PROMOTION_TWO) {
+    return total * 0.9; // 10% discount  0.1 (100% - 10% = 90%, o 0.9 en formato decimal).
+  } else {
+    return total
+  }
+};
+
+function totalValue(totalOrange, totalApp, bag = false, tip = 0, promotion = null) {
+  const precioTotalApp = calculateAppePrice(totalApp)
+  const totalUnits = totalOrange + totalApp
+  let totalValue = PRICE_ORANGE + precioTotalApp
+
+  if (bag) {
+    totalValue += 2;
+  }
+  const minimumTip = totalValue * 0.1;
+  if (tip) {
+    if (tip > minimumTip) {
+      totalValue += tip
+    }
+  }
+  if (promotion) {
+    totalValue = applyPromotion(totalValue, promotion)
+  }
+  return Math.ceil(totalValue); // redondeamos hacia arriba el resultado
+};
+
+console.log(totalValue(12, 20, true, 0, 'one'))
+
+
